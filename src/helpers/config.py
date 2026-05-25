@@ -1,3 +1,4 @@
+from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -5,7 +6,7 @@ class Settings(BaseSettings):
     APP_NAME: str
     APP_VERSION: str
     OPENAI_API_KEY: str
-    FILE_ALLOWED_TYPES: list[str]
+    FILE_ALLOWED_TYPES: List[str]
     FILE_MAX_SIZE_MB: int
 
     class Config:
