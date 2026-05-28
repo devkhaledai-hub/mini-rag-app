@@ -4,3 +4,6 @@ python-multipart==0.0.9
 python-dotenv==1.0.1
 pydantic-settings==2.2.1 # load config from .env file
 aiofiles==24.1.0 # async file handling, used for file uploads
+langchain==0.1.20
+PyMuPDF==1.24.0 # PDF parsing for document ingestion
+Motor==3.4.0
