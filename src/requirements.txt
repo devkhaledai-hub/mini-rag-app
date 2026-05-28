@@ -5,5 +5,8 @@ python-dotenv==1.0.1
 pydantic-settings==2.2.1 # load config from .env file
 aiofiles==24.1.0 # async file handling, used for file uploads
 langchain==0.1.20
+langchain-community==0.0.38
+langchain-text-splitters==0.0.2
 PyMuPDF==1.24.0 # PDF parsing for document ingestion
-Motor==3.4.0
+motor==3.4.0
+pymongo==4.6.3

@@ -1,7 +1,4 @@
-from xmlrpc import client
-
 from fastapi import FastAPI
-from ultralytics import settings
 from routes import base, data
 from motor.motor_asyncio import AsyncIOMotorClient
 from helpers.config import get_settings
