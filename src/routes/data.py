@@ -8,8 +8,11 @@ from models import ResponseSignal
 import logging
 from .schemas.data import ProcessRequest  # Import all schemas from the schemas package
 from models.ProjectModel import ProjectModel
-from models.db_schemas import DataChunk
+from models.db_schemas import DataChunk, Asset
 from models.ChunkModel import ChunkModel
+from models.AssetModel import AssetModel
+from models.enums.AssetTypeEnum import AssetTypeEnum
+
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -56,9 +59,22 @@ async def upload_data(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"signal": ResponseSignal.FILE_UPLOAD_FAILURE.value},
         )
+    # store the assets in the db 
+    asset_model = await AssetModel.create_instance(db_client=request.app.db_clinet)
+    asset_resource = Asset(
+        
+        asset_project_id=project.id,
+        asset_type=AssetTypeEnum.FILE.value,
+        asset_name=file_id,
+        asset_size=os.path.getsize(file_path)
+    )
+    asset_record = await asset_model.create_asset(asset=asset_resource)
 
     return JSONResponse(
-        content={"signal": ResponseSignal.FILE_UPLOAD_SUCCESS.value, "file_id": file_id}
+        content={
+            "signal": ResponseSignal.FILE_UPLOAD_SUCCESS.value, 
+            "file_id":str(asset_record.id),
+            }
     )
 
 
