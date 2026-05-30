@@ -10,3 +10,4 @@ langchain-text-splitters==0.0.2
 PyMuPDF==1.24.0 # PDF parsing for document ingestion
 motor==3.4.0
 pymongo==4.6.3
+openai==1.58.0
