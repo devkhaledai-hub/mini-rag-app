@@ -25,6 +25,7 @@ class CohereProvider(LLMInterface):
         self.embedding_size = None
 
         self.client = cohere.Client(api_key=self.api_key)
+        self.enums = CohereEnums
         self.logger = logging.getLogger(__name__) # Setting up a logger for the class to log important information and errors. The logger will use the module's name as its identifier.
 
     def set_generation_model(self, model_id: str): # help me to change the model id while the running of the app without creating a new instance of the provider class
@@ -77,25 +78,39 @@ class CohereProvider(LLMInterface):
             self.logger.error("Embedding model ID is not set.")
             return None
         
-        input_type = CohereEnums.DOCUMENT
-        if document_type == DocumentTypeEnum.QUERY:
-            input_type = CohereEnums.QUERY
+        input_type = CohereEnums.DOCUMENT.value
+        if document_type in (DocumentTypeEnum.QUERY, DocumentTypeEnum.QUERY.value):
+            input_type = CohereEnums.QUERY.value
 
 
         response = self.client.embed(
             model=self.embedding_model_id,
             texts=[text],
             input_type=input_type,
-            embedding_types=['float16'] # Using float16 to reduce the size of the embeddings and save storage space, while still maintaining a good level of precision for similarity calculations.
+            embedding_types=["float"]
         )
 
-        if not response or not response.embeddings or not response.embeddings.float:
+        response_embeddings = getattr(response, "embeddings", None)
+        if response is None or response_embeddings is None:
+            self.logger.error("No embeddings received from Cohere API.")
+            return None
+
+        embeddings = getattr(response_embeddings, "float", None)
+        if embeddings is None:
+            embeddings_by_type = getattr(response_embeddings, "embeddings", None)
+            embeddings = getattr(embeddings_by_type, "float", None)
+
+        if embeddings is None and isinstance(response_embeddings, dict):
+            embeddings = response_embeddings.get("float")
+
+        if embeddings is None or len(embeddings) == 0:
             self.logger.error("No embeddings received from Cohere API.")
             return None
         
-        return response.embeddings.float[0]
+        return embeddings[0]
 
     def construct_prompt(self, prompt: str, role:str):
+        role = role.value if hasattr(role, "value") else role
         return {
             "role": role,
             "text": self.process_text(prompt)

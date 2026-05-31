@@ -29,7 +29,7 @@ class OpenAIProvider(LLMInterface):
             api_key=self.api_key,
             base_url=self.api_url
         )
-
+        self.enums = OpenAIEnums
         self.logger = logging.getLogger(__name__) # Setting up a logger for the class to log important information and errors. The logger will use the module's name as its identifier.
 
     def set_generation_model(self, model_id: str): # help me to change the model id while the running of the app without creating a new instance of the provider class

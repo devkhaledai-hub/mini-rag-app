@@ -27,7 +27,7 @@ async def upload_data(
     app_settings: Settings = Depends(get_settings),
 ):
 
-    project_model = await ProjectModel.create_instance(db_client=request.app.db_clinet)
+    project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
 
     project = await project_model.get_project_or_create_one(project_id=project_id)
 
@@ -60,7 +60,7 @@ async def upload_data(
             content={"signal": ResponseSignal.FILE_UPLOAD_FAILURE.value},
         )
     # store the assets in the db 
-    asset_model = await AssetModel.create_instance(db_client=request.app.db_clinet)
+    asset_model = await AssetModel.create_instance(db_client=request.app.db_client)
     asset_resource = Asset(
         
         asset_project_id=project.id,
@@ -88,13 +88,13 @@ async def process_endpoint(
     do_reset = process_request.do_reset
 
     project_model = await ProjectModel.create_instance(
-        db_client=request.app.db_clinet
+        db_client=request.app.db_client
         )
     project = await project_model.get_project_or_create_one(
         project_id=project_id
         )
     
-    asset_model = await AssetModel.create_instance(db_client=request.app.db_clinet)
+    asset_model = await AssetModel.create_instance(db_client=request.app.db_client)
     project_files_ids={}
 
     if process_request.file_id:
@@ -135,7 +135,7 @@ async def process_endpoint(
         )
 
     chunk_model = await ChunkModel.create_instance(
-        db_client=request.app.db_clinet
+        db_client=request.app.db_client
         )
 
     if do_reset == 1:
