@@ -27,7 +27,7 @@ class OpenAIProvider(LLMInterface):
 
         self.client = OpenAI(
             api_key=self.api_key,
-            base_url=self.api_url
+            base_url=self.api_url if self.api_url and len(self.api_url) > 0 else None
         )
         self.enums = OpenAIEnums
         self.logger = logging.getLogger(__name__) # Setting up a logger for the class to log important information and errors. The logger will use the module's name as its identifier.
