@@ -113,5 +113,5 @@ class CohereProvider(LLMInterface):
         role = role.value if hasattr(role, "value") else role
         return {
             "role": role,
-            "text": self.process_text(prompt)
+            "text": prompt,
         }
