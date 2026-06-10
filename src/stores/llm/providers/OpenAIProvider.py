@@ -6,7 +6,7 @@ import logging
 from urllib import request as urlrequest
 from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse, urlunparse
-
+from typing import List, Union
 class OpenAIProvider(LLMInterface):
 
     def __init__(
@@ -102,10 +102,13 @@ class OpenAIProvider(LLMInterface):
         return content
 
 
-    def embed_text(self, text: str, document_type: str = None):
+    def embed_text(self, text: Union[str, List[str]], document_type: str = None):
         if not self.client:
             self.logger.error("OpenAI client is not initialized.")
             return None
+        
+        if isinstance(text, str):
+            text = [text]
 
         if not self.embedding_model_id:
             self.logger.error("Embedding model ID is not set.")
@@ -124,7 +127,7 @@ class OpenAIProvider(LLMInterface):
             self.logger.error("No embedding data received from OpenAI API.")
             return None
         
-        return response.data[0].embedding
+        return [rec.embedding for rec in response.data]
 
 
     def construct_prompt(self, prompt: str, role:str):
