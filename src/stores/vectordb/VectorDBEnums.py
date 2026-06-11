@@ -18,8 +18,8 @@ class PgVectorTableSchemaEnums(Enum):
     _PREFIX = 'pgvector'
 
 class PgVectorDistanceMethodEnums(Enum):
-    COSINE = "cosine"
-    DOT ="dot"
+    COSINE = "vector_cosine_ops"
+    DOT ="vector_l2_ops"
 
 class PgVectorIndexTypeEnums(Enum):
     IVFFLAT = "ivfflat"

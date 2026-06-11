@@ -154,8 +154,10 @@ async def process_endpoint(
         )
 
     if do_reset == 1:
+        # Delete associated vector db collection
         collection_name = nlp_controller.create_collection_name(project_id=project.project_id)
         
+        # delete associated chunks in the db
         _ = await request.app.vectordb_client.delete_collection(collection_name=collection_name)
 
         _ = await chunk_model.delete_chunks_by_project_id(
