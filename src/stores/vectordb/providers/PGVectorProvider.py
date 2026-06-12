@@ -1,9 +1,9 @@
 from ..VectorDBInterface import VectorDBInterface
-from ..VectorDBEnums import (DistanceMethodEnums, PgVectorTableSchemeEnums, 
+from ..VectorDBEnums import (DistanceMethodEnums, PgVectorTableSchemaEnums, 
                              PgVectorDistanceMethodEnums, PgVectorIndexTypeEnums)
 import logging
 from typing import List
-from models.db_schemes import RetrievedDocument
+from models.db_schemas import RetrievedDocument
 from sqlalchemy.sql import text as sql_text
 import json
 
@@ -22,7 +22,7 @@ class PGVectorProvider(VectorDBInterface):
         elif distance_method == DistanceMethodEnums.DOT.value:
             distance_method = PgVectorDistanceMethodEnums.DOT.value
 
-        self.pgvector_table_prefix = PgVectorTableSchemeEnums._PREFIX.value
+        self.pgvector_table_prefix = PgVectorTableSchemaEnums._PREFIX.value
         self.distance_method = distance_method
 
         self.logger = logging.getLogger("uvicorn")
@@ -116,12 +116,12 @@ class PGVectorProvider(VectorDBInterface):
                 async with session.begin():
                     create_sql = sql_text(
                         f'CREATE TABLE {collection_name} ('
-                            f'{PgVectorTableSchemeEnums.ID.value} bigserial PRIMARY KEY,'
-                            f'{PgVectorTableSchemeEnums.TEXT.value} text, '
-                            f'{PgVectorTableSchemeEnums.VECTOR.value} vector({embedding_size}), '
-                            f'{PgVectorTableSchemeEnums.METADATA.value} jsonb DEFAULT \'{{}}\', '
-                            f'{PgVectorTableSchemeEnums.CHUNK_ID.value} integer, '
-                            f'FOREIGN KEY ({PgVectorTableSchemeEnums.CHUNK_ID.value}) REFERENCES chunks(chunk_id)'
+                            f'{PgVectorTableSchemaEnums.ID.value} bigserial PRIMARY KEY,'
+                            f'{PgVectorTableSchemaEnums.TEXT.value} text, '
+                            f'{PgVectorTableSchemaEnums.VECTOR.value} vector({embedding_size}), '
+                            f'{PgVectorTableSchemaEnums.METADATA.value} jsonb DEFAULT \'{{}}\', '
+                            f'{PgVectorTableSchemaEnums.CHUNK_ID.value} integer, '
+                            f'FOREIGN KEY ({PgVectorTableSchemaEnums.CHUNK_ID.value}) REFERENCES chunks(chunk_id)'
                         ')'
                     )
                     await session.execute(create_sql)
@@ -165,7 +165,7 @@ class PGVectorProvider(VectorDBInterface):
                 index_name = self.default_index_name(collection_name)
                 create_idx_sql = sql_text(
                                             f'CREATE INDEX {index_name} ON {collection_name} '
-                                            f'USING {index_type} ({PgVectorTableSchemeEnums.VECTOR.value} {self.distance_method})'
+                                            f'USING {index_type} ({PgVectorTableSchemaEnums.VECTOR.value} {self.distance_method})'
                                           )
 
                 await session.execute(create_idx_sql)
@@ -200,7 +200,7 @@ class PGVectorProvider(VectorDBInterface):
         async with self.db_client() as session:
             async with session.begin():
                 insert_sql = sql_text(f'INSERT INTO {collection_name} '
-                                      f'({PgVectorTableSchemeEnums.TEXT.value}, {PgVectorTableSchemeEnums.VECTOR.value}, {PgVectorTableSchemeEnums.METADATA.value}, {PgVectorTableSchemeEnums.CHUNK_ID.value}) '
+                                      f'({PgVectorTableSchemaEnums.TEXT.value}, {PgVectorTableSchemaEnums.VECTOR.value}, {PgVectorTableSchemaEnums.METADATA.value}, {PgVectorTableSchemaEnums.CHUNK_ID.value}) '
                                       'VALUES (:text, :vector, :metadata, :chunk_id)'
                                       )
                 
@@ -255,10 +255,10 @@ class PGVectorProvider(VectorDBInterface):
                         })
                     
                     batch_insert_sql = sql_text(f'INSERT INTO {collection_name} '
-                                    f'({PgVectorTableSchemeEnums.TEXT.value}, '
-                                    f'{PgVectorTableSchemeEnums.VECTOR.value}, '
-                                    f'{PgVectorTableSchemeEnums.METADATA.value}, '
-                                    f'{PgVectorTableSchemeEnums.CHUNK_ID.value}) '
+                                    f'({PgVectorTableSchemaEnums.TEXT.value}, '
+                                    f'{PgVectorTableSchemaEnums.VECTOR.value}, '
+                                    f'{PgVectorTableSchemaEnums.METADATA.value}, '
+                                    f'{PgVectorTableSchemaEnums.CHUNK_ID.value}) '
                                     f'VALUES (:text, :vector, :metadata, :chunk_id)')
                     
                     await session.execute(batch_insert_sql, values)
@@ -277,7 +277,7 @@ class PGVectorProvider(VectorDBInterface):
         vector = "[" + ",".join([ str(v) for v in vector ]) + "]"
         async with self.db_client() as session:
             async with session.begin():
-                search_sql = sql_text(f'SELECT {PgVectorTableSchemeEnums.TEXT.value} as text, 1 - ({PgVectorTableSchemeEnums.VECTOR.value} <=> :vector) as score'
+                search_sql = sql_text(f'SELECT {PgVectorTableSchemaEnums.TEXT.value} as text, 1 - ({PgVectorTableSchemaEnums.VECTOR.value} <=> :vector) as score'
                                       f' FROM {collection_name}'
                                       ' ORDER BY score DESC '
                                       f'LIMIT {limit}'

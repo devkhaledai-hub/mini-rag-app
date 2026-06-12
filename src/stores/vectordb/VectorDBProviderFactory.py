@@ -23,7 +23,7 @@ class VectorDBProviderFactory:
                 index_threshold=self.config.VECTOR_DB_PGVEC_INDEX_THREADSHOLD
             )
         
-        if provider == VectorDBEnums.PGVEC.value:
+        if provider == VectorDBEnums.PGVECTOR.value:
             return PGVectorProvider(
                 db_client=self.db_client,
                 distance_method=self.config.VECTOR_DB_DISTANCE_METHOD,
