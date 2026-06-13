@@ -7,9 +7,10 @@ from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
 from stores.llm.templates.template_parser import TemplateParser
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-
+from utils.metrics import PrometheusMiddleware
 
 app = FastAPI()
+PrometheusMiddleware(app)
 
 async def startup_span():
     settings = get_settings()
