@@ -4,37 +4,59 @@
 # sudo docker rm $(sudo docker volume ls -q)
 # sudo docker system prune --all
 
-services:
-  mongodb:
-    image: mongo:7-jammy
-    container_name: mongodb
-    ports:
-      - "27007:27017"
-    volumes:
-      - mongodata:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-    networks:
-      - backend
-    restart: always
+# sudo docker stop $(sudo docker ps -aq)
+# sudo docker rm $(sudo docker ps -aq)
+# sudo docker rmi $(sudo docker images -q)
+# sudo docker rm $(sudo docker volume ls -q)
+# sudo docker system prune --all
 
+services:
+  # Fast api Application
+
+
+  # Nginx service
+
+
+  # PostgreSQL (pgvector) service
   pgvector:
-    image: pgvector/pgvector:0.8.2-pg17
+    image: pgvector/pgvector:0.8.2-pg18-trixie
     container_name: pgvector
     ports:
       - "5432:5432"
     volumes:
-      - pgvector_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - 'pgvector:/var/lib/postgresql/data'
+    env_file:
+      - ./env/.env.postgres
     networks:
       - backend
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-networks:
-  backend:
+  # Qdrant (vectordb) service
 
-volumes:
-  mongodata:
-  pgvector_data:
+  # Prometheus Monitoring service
+
+  # Prometheus Monitoring service
+
+  # Grafana service
+
+  # Node Exporter service
+
+  # Postgres Exporter service
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.19.1
+    container_name: postgres-exporter
+    ports:
+      - "9187:9187"
+    env_file:
+      - ./env/.env.postgres-exporter
+    depends_on:
+      - pgvector
+    networks:
+      - backend
+    restart: always
