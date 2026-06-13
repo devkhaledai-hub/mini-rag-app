@@ -2,6 +2,7 @@ from ...LLMEnums import CohereEnums, DocumentTypeEnum
 from ...LLMInterface import LLMInterface
 import cohere
 import logging
+from typing import List, Union
 
 
 class CohereProvider(LLMInterface):
@@ -69,10 +70,13 @@ class CohereProvider(LLMInterface):
         return response.text
     
 
-    def embed_text(self, text: str, document_type: str = None):
+    def embed_text(self, text: Union[str, List[str]], document_type: str = None):
         if not self.client:
             self.logger.error("Cohere client is not initialized.")
             return None
+        
+        if isinstance(text, str):
+            text = [text]
         
         if not self.embedding_model_id:
             self.logger.error("Embedding model ID is not set.")
@@ -85,7 +89,7 @@ class CohereProvider(LLMInterface):
 
         response = self.client.embed(
             model=self.embedding_model_id,
-            texts=[text],
+            texts=[self.process_text(t) for t in text],
             input_type=input_type,
             embedding_types=["float"]
         )
@@ -107,11 +111,11 @@ class CohereProvider(LLMInterface):
             self.logger.error("No embeddings received from Cohere API.")
             return None
         
-        return embeddings[0]
+        return [f for f in response.embeddings.float] 
 
     def construct_prompt(self, prompt: str, role:str):
         role = role.value if hasattr(role, "value") else role
         return {
             "role": role,
-            "text": self.process_text(prompt)
+            "text": prompt,
         }
